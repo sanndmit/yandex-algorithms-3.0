@@ -1,3 +1,6 @@
+/.vscode/
+*.txt
+
 # Compiled class file
 *.class
 
