@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
@@ -15,9 +16,9 @@ public class TaskA {
 
         FileWriter writer = new FileWriter("output.txt");
 
-        Stack<Integer> train = new Stack<>();
+        Stack<BigInteger> train = new Stack<>();
         Stack<String> stuff = new Stack<>();
-        Map<String, Integer> total = new HashMap<>();
+        Map<String, BigInteger> total = new HashMap<>();
 
         for (int i = 0; i < n; i++) {
 
@@ -25,28 +26,33 @@ public class TaskA {
 
             if (command[0].equals("add")) {
 
-                Integer qty = Integer.valueOf(command[1]);
+                BigInteger qty = new BigInteger(command[1]);
                 String cmmd = command[2];
 
                 train.push(qty);
                 stuff.push(cmmd);
-                total.put(cmmd, ((total.containsKey(cmmd)) ? total.get(cmmd) : 0) + qty);
+                total.put(cmmd, ((total.containsKey(cmmd)) ? total.get(cmmd) : new BigInteger("0")).add(qty));
 
             } else if (command[0].equals("delete")) {
 
-                Integer qty = Integer.valueOf(command[1]);
-                while (qty != 0) {
+                BigInteger qty = new BigInteger(command[1]);
+                boolean proceed = true;
+                while (proceed) {
 
-                    Integer removed = train.pop();
+                    BigInteger removed = train.pop();
                     String cmmd = stuff.pop();
-                    if (removed > qty) {
-                        train.push(removed - qty);
+                    BigInteger curr = (total.containsKey(cmmd)) ? total.get(cmmd) : new BigInteger("0");
+
+                    if (removed.compareTo(qty) > 0) {
+                        train.push(removed.subtract(qty));
                         stuff.push(cmmd);
-                        total.put(cmmd, ((total.containsKey(cmmd)) ? total.get(cmmd) : 0) - qty);
-                        qty = 0;
+                        total.put(cmmd, curr.subtract(qty));
+                        proceed = false;
                     } else {
-                        total.put(cmmd, ((total.containsKey(cmmd)) ? total.get(cmmd) : 0) - removed);
-                        qty -= removed;
+                        total.put(cmmd, curr.subtract(removed));
+                        qty = qty.subtract(removed);
+                        if (qty.equals(new BigInteger("0")))
+                            proceed = false;
                     }
 
                 }
